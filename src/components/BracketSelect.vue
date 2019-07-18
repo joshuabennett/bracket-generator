@@ -32,19 +32,31 @@
                 <div class="field-body">
                     <div class="field">
                         <div class="control">
-                            <input class="input is-primary" type="text" placeholder="Primary input" v-model='numPlayers'>
+                            <input class="input is-primary" type="text" placeholder="Primary input" v-model='bracket.numPlayers'>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="field is-horizontal" v-if="selected == 'Round Robin'">
                 <div class='field-label is-normal'>
+                    <label class="label">Number of Groups:</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <div class="control">
+                            <input class="input is-primary" type="text" placeholder="Primary input" v-model='bracket.groups'>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                        <div class="field is-horizontal" v-if="selected == 'Round Robin'">
+                <div class='field-label is-normal'>
                     <label class="label">Cut to Top:</label>
                 </div>
                 <div class="field-body">
                     <div class="field">
                         <div class="control">
-                            <input class="input is-primary" type="text" placeholder="Primary input" v-model='cut'>
+                            <input class="input is-primary" type="text" placeholder="Primary input" v-model='bracket.cut'>
                         </div>
                     </div>
                 </div>
@@ -56,7 +68,7 @@
                 <div class="field-body">
                     <div class="field">
                         <div class="control">
-                            <button class="button is-primary">
+                            <button class="button is-primary" @click='submitBracket'>
                             Submit
                             </button>
                         </div>
@@ -72,8 +84,16 @@ export default {
     data: function() {
         return {
             selected: '',
-            numPlayers: '0',
-            cut: '2'
+            bracket: {
+                numPlayers: 0,
+                cut: 2,
+                groups: 1
+            }
+        }
+    },
+    methods: {
+        submitBracket() {
+            this.$emit('updateBracket', this.bracket)
         }
     }
 
