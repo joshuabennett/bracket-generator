@@ -1,11 +1,26 @@
 <template>
-    <div class="container1">
-        <div class="bracket-column" v-for='item in bracketLayout'>
-            <div class="matchup" v-for='n in item'>
-                <input class="input">
-                <input class="input">
+    <div class="wrapper">
+        <div class="container1">
+            <div class="bracket-column" v-for='(item, index) in bracketLayout' :class="'row'+index">
+                <div class="matchup" v-for='(n, index2) in item' v-if='n.round != 0 || submitted == true'>
+                    <button class="button" 
+                        :class="getColor(n, n.player1)"
+                        @click='isWinner(n, n.player1)'>
+                        {{ n.player1 }}
+                    </button>
+                    <button class="button" 
+                        :class="getColor(n, n.player2)"
+                        @click='isWinner(n, n.player2)'> 
+                        {{ n.player2 }}
+                    </button>
+                </div>
+                <div class="matchup" v-for='(n, index2) in item' v-if='n.round == 0 && submitted == false'>
+                    <input class="input is-primary" v-model='n.player1' placeholder='Player Name' @click='isWinner(n, n.player1)'>
+                    <input class="input is-primary" v-model='n.player2' placeholder='Player Name' @click='isWinner(n, n.player2)'>
+                </div>
             </div>
         </div>
+        <button class="button is-info submit-button" @click='lockPlayers' :disabled='submitted'>Submit Players</button>
     </div>
 </template>
 
@@ -13,22 +28,87 @@
 export default {
     data: function() {
         return {
-            bracketLayout: []
+            bracketLayout: [],
+            submitted: false
         }
     },
     props: ['numPlayers'],
+    methods: {
+        lockPlayers() {
+            this.submitted = true;
+            var inputs = document.querySelectorAll('.input').forEach((input) => {
+                let button = document.createElement('button');
+                button.className = 'button is-primary'
+                button.innerHTML = input.getAttribute('placeholder');
+                input.parentNode.replaceChild(button, input);
+            });
+            console.log(this.bracketLayout);
+
+        },
+        isWinner(matchup, winner) {
+            matchup.winner = winner;
+            var round = matchup.round + 1;
+            var nextMatchup;
+            if (matchup.matchup % 2 == 0) {
+                nextMatchup = matchup.matchup / 2;
+                this.bracketLayout[round][nextMatchup].player1 = winner;
+            } else {
+                nextMatchup = (matchup.matchup - 1) / 2;
+                this.bracketLayout[round][nextMatchup].player2 = winner;
+            }
+            console.log(winner);
+    
+        },
+        getColor(n, curPlayer) {
+            if (n.winner.length > 0 && n.winner != curPlayer) {
+                return 'is-danger';
+            }
+            else if ( n.winner.length > 0 && n.winner == curPlayer) {
+                return 'is-primary';
+            }
+            else {
+                return 'is-info';
+            }
+        }
+    },
     created() {
-        var counter = this.numPlayers / 2;
-        while(counter > 1) {
-            this.bracketLayout.push(counter / 2);
-            counter = counter / 2;
+        // Depth is equal to 
+        // x = Math.ciel(Math.log(numPlayers) / Math.log(2)) + 1;
+        var numMatchups = this.numPlayers / 4;
+        var round = 0;
+        while(numMatchups >= 1) {
+            this.bracketLayout[round] = [];
+            for (let matchup = 0; matchup < numMatchups; matchup++) {
+                this.bracketLayout[round][matchup] = {
+                    round: round,
+                    matchup: matchup,
+                    player1: '',
+                    player2: '',
+                    winner: '',
+                }
+            }
+            round++;
+            numMatchups /= 2;
         }
-        this.bracketLayout.push(0);
-        counter = 1;
-        while(counter < this.numPlayers / 2) {
-            this.bracketLayout.push(counter);
-            counter = counter * 2;
+
+        function copy(o) {
+            var output, v, key;
+            output = Array.isArray(o) ? [] : {};
+            for (key in o) {
+                v = o[key];
+                output[key] = (typeof v === "object") ? copy(v) : v;
+            }
+            return output;
         }
+
+        var copy1 = copy(this.bracketLayout);
+        var copy2 = copy(this.bracketLayout);
+        for (let i = 0; i < copy2.length; i++) {
+            for (let j = 0; j < copy2[i].length; j++ ) {
+                copy2[i][j].matchup += this.numPlayers / 4;
+            }
+        }
+        this.bracketLayout = copy1.concat(copy2.reverse());
         console.log(this.bracketLayout);
     }
 }
@@ -38,10 +118,14 @@ export default {
 .container1 {
     display: flex;
     flex-direction: row;
+}
+.wrapper {
+    display: flex;
+    flex-direction: column;
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%,-50%);
-    width: 1200px;
+    width: auto;
     border-radius: 10px;
     background-color: white;
     overflow: hidden;
@@ -50,14 +134,21 @@ export default {
 .bracket-column {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
 }
 .matchup {
     padding: 10px;
+    display: flex;
+    flex-direction: column;
 }
-.matchup input {
+.matchup button, .matchup input {
     margin-top: 1px;
     margin-bottom: 1px;
+    border: 1px solid green;
+    width: 150px;
+}
+.submit-button {
+    margin-top: 20px;
 }
 </style>

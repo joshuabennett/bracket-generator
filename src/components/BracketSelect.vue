@@ -1,5 +1,5 @@
 <template>
-    <div class='container1'>
+    <div class='wrapper'>
         <div class="poster">
             <span class="image">
                 <img src='https://upload.wikimedia.org/wikipedia/commons/4/49/Smash_Ball.png'>
@@ -104,7 +104,7 @@ export default {
 html {
     background: whitesmoke;
 }
-.container1 {
+.wrapper {
     display: flex;
     flex-direction: row;
     position: absolute;
