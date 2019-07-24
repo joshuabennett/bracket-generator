@@ -46,8 +46,17 @@ export default {
 
         },
         isWinner(matchup, winner) {
+
             matchup.winner = winner;
-            var round = matchup.round + 1;
+            var totalRounds = this.bracketLayout.length -1 ;
+
+            var round;
+            if (matchup.side == 'left') {
+                round = matchup.round + 1;
+            } else {
+                round = totalRounds - matchup.round - 1;
+                console.log('Round: ' + round);
+            }
             var nextMatchup;
             if (matchup.matchup % 2 == 0) {
                 nextMatchup = matchup.matchup / 2;
@@ -61,7 +70,7 @@ export default {
         },
         getColor(n, curPlayer) {
             if (n.winner.length > 0 && n.winner != curPlayer) {
-                return 'is-danger';
+                return 'is-danger broken';
             }
             else if ( n.winner.length > 0 && n.winner == curPlayer) {
                 return 'is-primary';
@@ -80,6 +89,7 @@ export default {
             this.bracketLayout[round] = [];
             for (let matchup = 0; matchup < numMatchups; matchup++) {
                 this.bracketLayout[round][matchup] = {
+                    side: 'left',
                     round: round,
                     matchup: matchup,
                     player1: '',
@@ -105,7 +115,8 @@ export default {
         var copy2 = copy(this.bracketLayout);
         for (let i = 0; i < copy2.length; i++) {
             for (let j = 0; j < copy2[i].length; j++ ) {
-                copy2[i][j].matchup += this.numPlayers / 4;
+                //copy2[i][j].matchup += this.numPlayers / 4;
+                copy2[i][j].side = 'right';
             }
         }
         this.bracketLayout = copy1.concat(copy2.reverse());
@@ -150,5 +161,8 @@ export default {
 }
 .submit-button {
     margin-top: 20px;
+}
+.broken {
+    opacity: 0.35;
 }
 </style>
