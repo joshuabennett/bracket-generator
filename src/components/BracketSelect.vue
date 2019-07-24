@@ -14,10 +14,10 @@
                     <div class="field">
                         <div class="control">
                             <div class="select">
-                                <select v-model='selected'>
+                                <select v-model='bracket.mode'>
                                     <option disabled value=''>Select Bracket Type</option>
-                                    <option >Single Elimination</option>
-                                    <option >Double Elimination</option>
+                                    <option value='single' >Single Elimination</option>
+                                    <option value='double'>Double Elimination</option>
                                     <option >Round Robin</option>
                                 </select>
                             </div>
@@ -37,7 +37,7 @@
                     </div>
                 </div>
             </div>
-            <div class="field is-horizontal" v-if="selected == 'Round Robin'">
+            <div class="field is-horizontal" v-if="bracket.mode == 'Round Robin'">
                 <div class='field-label is-normal'>
                     <label class="label">Number of Groups:</label>
                 </div>
@@ -49,7 +49,7 @@
                     </div>
                 </div>
             </div>
-                        <div class="field is-horizontal" v-if="selected == 'Round Robin'">
+                        <div class="field is-horizontal" v-if="bracket.mode == 'Round Robin'">
                 <div class='field-label is-normal'>
                     <label class="label">Cut to Top:</label>
                 </div>
@@ -83,8 +83,8 @@
 export default {
     data: function() {
         return {
-            selected: '',
             bracket: {
+                mode: '',
                 numPlayers: 0,
                 cut: 2,
                 groups: 1

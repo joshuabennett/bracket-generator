@@ -32,7 +32,7 @@ export default {
             submitted: false
         }
     },
-    props: ['numPlayers'],
+    props: ['numPlayers', 'mode'],
     methods: {
         lockPlayers() {
             this.submitted = true;
@@ -81,9 +81,17 @@ export default {
         }
     },
     created() {
+        console.log(this.mode);
+        var bracketDivider;
+        if (this.mode == 'single') {
+            bracketDivider = 4;
+        }
+        else if (this.mode == 'double') {
+            bracketDivider = 2;
+        }
         // Depth is equal to 
         // x = Math.ciel(Math.log(numPlayers) / Math.log(2)) + 1;
-        var numMatchups = this.numPlayers / 4;
+        var numMatchups = this.numPlayers / bracketDivider;
         var round = 0;
         while(numMatchups >= 1) {
             this.bracketLayout[round] = [];
@@ -111,16 +119,21 @@ export default {
             return output;
         }
 
-        var copy1 = copy(this.bracketLayout);
-        var copy2 = copy(this.bracketLayout);
-        for (let i = 0; i < copy2.length; i++) {
-            for (let j = 0; j < copy2[i].length; j++ ) {
-                //copy2[i][j].matchup += this.numPlayers / 4;
-                copy2[i][j].side = 'right';
+        if (this.mode == 'single') {
+            var copy1 = copy(this.bracketLayout);
+            var copy2 = copy(this.bracketLayout);
+            for (let i = 0; i < copy2.length; i++) {
+                for (let j = 0; j < copy2[i].length; j++ ) {
+                    //copy2[i][j].matchup += this.numPlayers / 4;
+                    copy2[i][j].side = 'right';
+                }
             }
+            this.bracketLayout = copy1.concat(copy2.reverse());
         }
-        this.bracketLayout = copy1.concat(copy2.reverse());
-        console.log(this.bracketLayout);
+        else if (this.mode == 'double') {
+            var copy1 = copy(this.bracketLayout);
+            this.bracketLayout = copy1;
+        }
     }
 }
 </script>

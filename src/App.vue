@@ -1,7 +1,7 @@
 <template>
   <div>
     <bracket-select v-if='!submitted' @updateBracket='updateInfo'></bracket-select>
-    <bracket v-if='submitted' :numPlayers='bracket.numPlayers'></bracket>
+    <bracket v-if='submitted' :numPlayers='bracket.numPlayers' :mode='bracket.mode'></bracket>
   </div>
 </template>
 
