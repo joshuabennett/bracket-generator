@@ -1,8 +1,8 @@
 <template>
     <div class="wrapper has-text-centered">
         <br>
-        <h1 class="title is-size-6" v-if="mode == 'double'">Upper Bracket</h1>
-        <div class="container1">
+        <h1 class="title is-size-6" v-if="mode == 'double' && !isFinal">Upper Bracket</h1>
+        <div class="container1" v-if='!isFinal'>
             <div class="bracket-column" v-for='(item, index) in bracketLayout' :class="'row'+index">
                 <div class="matchup" v-for='(n, index2) in item' v-if='n.round != 0 || submitted == true'>
                     <button class="button" 
@@ -30,8 +30,8 @@
         </div>
         <button class="button is-info submit-button" @click='lockPlayers' :disabled='submitted' v-if='!submitted'>Submit Players</button>
         <br v-if="mode == 'double' && submitted">
-        <h1 class="title is-size-6" v-if="mode == 'double' && submitted">Lower Bracket</h1>
-        <div class="container1" v-if="mode == 'double' && submitted">
+        <h1 class="title is-size-6" v-if="mode == 'double' && submitted && !isFinal">Lower Bracket</h1>
+        <div class="container1" v-if="mode == 'double' && submitted && !isFinal">
             <div class="bracket-column" v-for='(item, index) in loserBracket' :class="'row'+index">
                 <div class="matchup" v-for='(n, index2) in item'>
                     <button class="button" 
@@ -53,6 +53,18 @@
                 </div>
             </div>
         </div>
+        <h1 class="title is-size-4" v-if='isFinal'>Grand Final</h1>
+        <div class="container1" v-if='isFinal'>
+            <div class="finalMatchup">
+                <button class="button is-info"> 
+                    <p>{{finalMatchup.player1}}</p>
+                </button>
+                <p> VS. </p>
+                <button class="button is-info"> 
+                    <p>{{finalMatchup.player2}}</p>
+                </button>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -62,6 +74,10 @@ export default {
         return {
             bracketLayout: [],
             loserBracket: [],
+            finalMatchup: {
+                player1: '',
+                player2: ''
+            },
             submitted: false
         }
     },
@@ -94,6 +110,18 @@ export default {
                 round = totalRounds - matchup.round - 1;
                 console.log('Round: ' + round);
             }
+            
+            if (round > totalRounds) {
+                this.finalMatchup.player1 = winner;
+                return true;
+            } else if (this.mode == 'single' && matchup.side == 'left' && round > totalRounds / 2) {
+                this.finalMatchup.player1 = winner;
+                return true;
+            } else if (this.mode == 'single' && matchup.side == 'right' && round < totalRounds / 2) {
+                this.finalMatchup.player2 = winner;
+                return true;
+            }
+
             var nextMatchup;
             if (matchup.matchup % 2 == 0) {
                 nextMatchup = matchup.matchup / 2;
@@ -109,13 +137,17 @@ export default {
                 }
             }
             console.log(winner);
-    
         },
         isBottomWinner(matchup, winner) {
             matchup.winner = winner;
             var round;
             var nextMatchup;
             round = matchup.round + 1;
+            if (round > this.loserBracket.length - 1) {
+                this.finalMatchup.player2 = winner;
+                return true;
+            }
+
             if (round % 2 != 0) {
                 this.loserBracket[round][matchup.matchup].player2 = winner;
             } else {
@@ -141,6 +173,11 @@ export default {
             else {
                 return 'is-dark';
             }
+        }
+    },
+    computed: {
+        isFinal() {
+            return this.finalMatchup.player1.length > 0 && this.finalMatchup.player2.length > 0;
         }
     },
     created() {
@@ -260,11 +297,23 @@ export default {
     display: flex;
     flex-direction: column;
 }
+.finalMatchup {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
 .matchup button, .matchup input {
     margin-top: 1px;
     margin-bottom: 1px;
     border: 1px solid green;
     width: 150px;
+}
+.finalMatchup button {
+    width: 200px;
+    height: 40px;
+    margin: 20px 5px 50px 5px
 }
 .submit-button {
     margin-top: 20px;
@@ -273,6 +322,6 @@ export default {
     opacity: 0.35;
 }
 .is-dark {
-    opacity: 0.4;
+    opacity: 0.25;
 }
 </style>
