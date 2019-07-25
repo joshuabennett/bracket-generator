@@ -32,7 +32,8 @@
                 <div class="field-body">
                     <div class="field">
                         <div class="control">
-                            <input class="input is-primary" type="text" placeholder="Primary input" v-model='bracket.numPlayers'>
+                            <input class="input is-primary" type="text" placeholder="Primary input" v-model='bracket.numPlayers' :class="{'is-danger' : isValidPlayers}">
+                            <p class="help is-danger" v-if='isValidPlayers'>Please put a valid amount of players (4, 8, or 16) </p>
                         </div>
                     </div>
                 </div>
@@ -68,7 +69,7 @@
                 <div class="field-body">
                     <div class="field">
                         <div class="control">
-                            <button class="button is-primary" @click='submitBracket'>
+                            <button class="button is-primary" @click='submitBracket' :disabled='isValidPlayers'>
                             Submit
                             </button>
                         </div>
@@ -94,6 +95,11 @@ export default {
     methods: {
         submitBracket() {
             this.$emit('updateBracket', this.bracket)
+        }
+    },
+    computed: {
+        isValidPlayers() {
+            return this.bracket.numPlayers % 4 != 0 || this.bracket.numPlayers > 16;
         }
     }
 

@@ -8,12 +8,18 @@
                     <button class="button" 
                         :class="getColor(n, n.player1)"
                         @click='isWinner(n, n.player1, n.player2)'>
-                        {{ n.player1 }}
+                        <p>{{ n.player1 }}</p>
+                        <span class="icon is-small" v-if='n.winner == n.player1 && n.winner.length > 0'>
+                            <i class="fas fa-check"></i>
+                        </span>
                     </button>
                     <button class="button" 
                         :class="getColor(n, n.player2)"
                         @click='isWinner(n, n.player2, n.player1)'> 
-                        {{ n.player2 }}
+                        <p>{{ n.player2 }}</p>
+                        <span class="icon is-small" v-if='n.winner == n.player2 && n.winner.length > 0'>
+                            <i class="fas fa-check"></i>
+                        </span>
                     </button>
                 </div>
                 <div class="matchup" v-for='(n, index2) in item' v-if='n.round == 0 && submitted == false'>
@@ -22,21 +28,27 @@
                 </div>
             </div>
         </div>
-        <button class="button is-info submit-button" @click='lockPlayers' :disabled='submitted'>Submit Players</button>
-        <br>
-        <h1 class="title is-size-6" v-if="mode == 'double'">Lower Bracket</h1>
-        <div class="container1" v-if="mode == 'double'">
+        <button class="button is-info submit-button" @click='lockPlayers' :disabled='submitted' v-if='!submitted'>Submit Players</button>
+        <br v-if="mode == 'double' && submitted">
+        <h1 class="title is-size-6" v-if="mode == 'double' && submitted">Lower Bracket</h1>
+        <div class="container1" v-if="mode == 'double' && submitted">
             <div class="bracket-column" v-for='(item, index) in loserBracket' :class="'row'+index">
                 <div class="matchup" v-for='(n, index2) in item'>
                     <button class="button" 
                         :class="getColor(n, n.player1)"
                         @click='isBottomWinner(n, n.player1)'>
-                        {{ n.player1 }}
+                        <p>{{ n.player1 }}</p>
+                        <span class="icon is-small" v-if='n.winner == n.player1 && n.winner.length > 0'>
+                            <i class="fas fa-check"></i>
+                        </span>
                     </button>
                     <button class="button" 
                         :class="getColor(n, n.player2)"
                         @click='isBottomWinner(n, n.player2)'> 
-                        {{ n.player2 }}
+                        <p>{{ n.player2 }}</p>
+                        <span class="icon is-small" v-if='n.winner == n.player2 && n.winner.length > 0'>
+                            <i class="fas fa-check"></i>
+                        </span>
                     </button>
                 </div>
             </div>
@@ -121,10 +133,13 @@ export default {
                 return 'is-danger broken';
             }
             else if ( n.winner.length > 0 && n.winner == curPlayer) {
-                return 'is-primary';
+                return 'is-success';
+            }
+            else if ( curPlayer ) {
+                return 'is-info';
             }
             else {
-                return 'is-info';
+                return 'is-dark';
             }
         }
     },
@@ -232,6 +247,7 @@ export default {
     background-color: white;
     overflow: hidden;
     box-shadow: rgba(0, 0, 0, 0.2) 0 30px 18px -24px;
+    min-width: 850px;
 }
 .bracket-column {
     display: flex;
@@ -255,5 +271,8 @@ export default {
 }
 .broken {
     opacity: 0.35;
+}
+.is-dark {
+    opacity: 0.4;
 }
 </style>
