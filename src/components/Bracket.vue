@@ -1,16 +1,18 @@
 <template>
-    <div class="wrapper">
+    <div class="wrapper has-text-centered">
+        <br>
+        <h1 class="title is-size-6" v-if="mode == 'double'">Upper Bracket</h1>
         <div class="container1">
             <div class="bracket-column" v-for='(item, index) in bracketLayout' :class="'row'+index">
                 <div class="matchup" v-for='(n, index2) in item' v-if='n.round != 0 || submitted == true'>
                     <button class="button" 
                         :class="getColor(n, n.player1)"
-                        @click='isWinner(n, n.player1)'>
+                        @click='isWinner(n, n.player1, n.player2)'>
                         {{ n.player1 }}
                     </button>
                     <button class="button" 
                         :class="getColor(n, n.player2)"
-                        @click='isWinner(n, n.player2)'> 
+                        @click='isWinner(n, n.player2, n.player1)'> 
                         {{ n.player2 }}
                     </button>
                 </div>
@@ -21,6 +23,24 @@
             </div>
         </div>
         <button class="button is-info submit-button" @click='lockPlayers' :disabled='submitted'>Submit Players</button>
+        <br>
+        <h1 class="title is-size-6" v-if="mode == 'double'">Lower Bracket</h1>
+        <div class="container1" v-if="mode == 'double'">
+            <div class="bracket-column" v-for='(item, index) in loserBracket' :class="'row'+index">
+                <div class="matchup" v-for='(n, index2) in item'>
+                    <button class="button" 
+                        :class="getColor(n, n.player1)"
+                        @click='isBottomWinner(n, n.player1)'>
+                        {{ n.player1 }}
+                    </button>
+                    <button class="button" 
+                        :class="getColor(n, n.player2)"
+                        @click='isBottomWinner(n, n.player2)'> 
+                        {{ n.player2 }}
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -29,6 +49,7 @@ export default {
     data: function() {
         return {
             bracketLayout: [],
+            loserBracket: [],
             submitted: false
         }
     },
@@ -45,14 +66,18 @@ export default {
             console.log(this.bracketLayout);
 
         },
-        isWinner(matchup, winner) {
+        isWinner(matchup, winner, loser) {
 
             matchup.winner = winner;
+            matchup.loser = loser;
             var totalRounds = this.bracketLayout.length -1 ;
 
             var round;
+            var lowRound;
             if (matchup.side == 'left') {
                 round = matchup.round + 1;
+                lowRound = matchup.round * 2 - 1;
+                if (lowRound < 0) lowRound = 0;
             } else {
                 round = totalRounds - matchup.round - 1;
                 console.log('Round: ' + round);
@@ -61,12 +86,35 @@ export default {
             if (matchup.matchup % 2 == 0) {
                 nextMatchup = matchup.matchup / 2;
                 this.bracketLayout[round][nextMatchup].player1 = winner;
+                this.loserBracket[lowRound][nextMatchup].player1 = loser;
             } else {
                 nextMatchup = (matchup.matchup - 1) / 2;
                 this.bracketLayout[round][nextMatchup].player2 = winner;
+                if (lowRound == 0) {
+                    this.loserBracket[lowRound][nextMatchup].player2 = loser;
+                } else {
+                    this.loserBracket[lowRound][nextMatchup+1].player1 = loser;
+                }
             }
             console.log(winner);
     
+        },
+        isBottomWinner(matchup, winner) {
+            matchup.winner = winner;
+            var round;
+            var nextMatchup;
+            round = matchup.round + 1;
+            if (round % 2 != 0) {
+                this.loserBracket[round][matchup.matchup].player2 = winner;
+            } else {
+                if (matchup.matchup % 2 == 0) {
+                    nextMatchup = matchup.matchup / 2;
+                    this.loserBracket[round][nextMatchup].player1 = winner;
+                } else {
+                    nextMatchup = (matchup.matchup - 1) / 2;
+                    this.loserBracket[round][nextMatchup].player2 = winner;
+            }
+            }
         },
         getColor(n, curPlayer) {
             if (n.winner.length > 0 && n.winner != curPlayer) {
@@ -103,7 +151,7 @@ export default {
                     player1: '',
                     player2: '',
                     winner: '',
-                }
+                };
             }
             round++;
             numMatchups /= 2;
@@ -131,8 +179,38 @@ export default {
             this.bracketLayout = copy1.concat(copy2.reverse());
         }
         else if (this.mode == 'double') {
+            var loserMatchups = this.numPlayers / bracketDivider / 2;
+            var loserRound = 0;
+            while(loserMatchups >= 1) {
+                this.loserBracket[loserRound] = [];
+                this.loserBracket[loserRound + 1] = [];
+                for (let matchup = 0; matchup < loserMatchups; matchup++) {
+                    this.loserBracket[loserRound][matchup] = {
+                        side: 'left',
+                        round: loserRound,
+                        matchup: matchup,
+                        player1: '',
+                        player2: '',
+                        winner: '',
+                        loser: ''
+                    };
+                    this.loserBracket[loserRound + 1][matchup] = {
+                        side: 'left',
+                        round: loserRound + 1,
+                        matchup: matchup,
+                        player1: '',
+                        player2: '',
+                        winner: '',
+                        loser: ''
+                    };
+                }
+                loserRound = loserRound + 2;
+                loserMatchups /= 2;
+            }
             var copy1 = copy(this.bracketLayout);
             this.bracketLayout = copy1;
+            var copy2 = copy(this.loserBracket);
+            this.loserBracket = copy2;
         }
     }
 }

@@ -85,7 +85,7 @@ export default {
         return {
             bracket: {
                 mode: '',
-                numPlayers: 0,
+                numPlayers: '0, 4, 8, or 16',
                 cut: 2,
                 groups: 1
             }
