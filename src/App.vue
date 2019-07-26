@@ -1,13 +1,15 @@
 <template>
   <div>
     <bracket-select v-if='!submitted' @updateBracket='updateInfo'></bracket-select>
-    <bracket v-if='submitted' :numPlayers='bracket.numPlayers' :mode='bracket.mode'></bracket>
+    <bracket v-if="submitted && bracket.mode != 'robin'" :numPlayers='bracket.numPlayers' :mode='bracket.mode'></bracket>
+    <round-robin v-if="bracket.mode == 'robin'" :bracketInfo='bracket'></round-robin>
   </div>
 </template>
 
 <script>
 import BracketSelect from './components/BracketSelect.vue';
 import Bracket from './components/Bracket.vue';
+import RoundRobin from './components/RoundRobin.vue';
 
 export default {
   data: function() {
@@ -18,7 +20,8 @@ export default {
   },
   components: {
     'bracket-select': BracketSelect,
-    'bracket': Bracket
+    'bracket': Bracket,
+    'round-robin': RoundRobin
   },
   methods: {
     updateInfo(e) {

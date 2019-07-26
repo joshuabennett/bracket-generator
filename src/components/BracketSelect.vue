@@ -18,7 +18,7 @@
                                     <option disabled value=''>Select Bracket Type</option>
                                     <option value='single' >Single Elimination</option>
                                     <option value='double'>Double Elimination</option>
-                                    <option >Round Robin</option>
+                                    <option value='robin'>Round Robin</option>
                                 </select>
                             </div>
                         </div>
@@ -32,13 +32,13 @@
                 <div class="field-body">
                     <div class="field">
                         <div class="control">
-                            <input class="input is-primary" type="text" placeholder="Primary input" v-model='bracket.numPlayers' :class="{'is-danger' : isValidPlayers}">
+                            <input class="input is-primary" type="text" placeholder="4, 8, or 16" v-model='bracket.numPlayers' :class="{'is-danger' : isValidPlayers}">
                             <p class="help is-danger" v-if='isValidPlayers'>Please put a valid amount of players (4, 8, or 16) </p>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="field is-horizontal" v-if="bracket.mode == 'Round Robin'">
+            <div class="field is-horizontal" v-if="bracket.mode == 'robin'">
                 <div class='field-label is-normal'>
                     <label class="label">Number of Groups:</label>
                 </div>
@@ -50,7 +50,7 @@
                     </div>
                 </div>
             </div>
-                        <div class="field is-horizontal" v-if="bracket.mode == 'Round Robin'">
+                        <div class="field is-horizontal" v-if="bracket.mode == 'robin'">
                 <div class='field-label is-normal'>
                     <label class="label">Cut to Top:</label>
                 </div>
@@ -86,7 +86,7 @@ export default {
         return {
             bracket: {
                 mode: '',
-                numPlayers: '0, 4, 8, or 16',
+                numPlayers: '',
                 cut: 2,
                 groups: 1
             }

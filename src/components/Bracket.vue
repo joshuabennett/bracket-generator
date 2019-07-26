@@ -113,6 +113,7 @@ export default {
             
             if (round > totalRounds) {
                 this.finalMatchup.player1 = winner;
+                this.loserBracket[lowRound][0].player1 = loser;
                 return true;
             } else if (this.mode == 'single' && matchup.side == 'left' && round > totalRounds / 2) {
                 this.finalMatchup.player1 = winner;
