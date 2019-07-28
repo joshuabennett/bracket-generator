@@ -29,8 +29,15 @@
             <div class="matchup-container">
                 <h1 class="title is-size-5 is-marginless">Matchups</h1>
                 <div class="pairing" v-for='matchup in curMatchups' v-if='submitted'> 
-                    <button class="button is-info">{{matchup.player1.name}}</button>
-                    <button class="button is-info">{{matchup.player2.name}}</button>
+                    <button class="button is-info" 
+                        @click='addWin(matchup, matchup.player1, matchup.player2)'
+                        :class="{'is-success': matchup.player1.name == matchup.winner}">
+                        {{matchup.player1.name}}
+                    </button>
+                    <button class="button is-info" 
+                        @click='addWin(matchup, matchup.player2, matchup.player1)'>
+                        {{matchup.player2.name}}
+                    </button>
                 </div>
             </div>
         </div>
@@ -51,6 +58,11 @@ export default {
     methods: {
         loadGroup(num) {
             this.activeGroup = num - 1;
+        },
+        addWin(matchup, winner, loser) {
+            matchup.winner = winner.name;
+            winner.wins++;
+            loser.losses++;
         }
     },
     computed: {
@@ -64,8 +76,7 @@ export default {
                     matchups.push({
                         player1: this.curGroup[i],
                         player2: this.curGroup[j],
-                        winner: '',
-                        loser: ''
+                        winner: ''
                     });
                 }
             }
@@ -74,14 +85,17 @@ export default {
     },
     created() {
         for (let groupNum = 0; groupNum < this.bracketInfo.groups; groupNum++) {
-            this.groups[groupNum] = [];
+            this.$set(this.groups, groupNum, []);
+            //this.groups[groupNum] = [];
             for (let playerNum = 0; playerNum < this.bracketInfo.numPlayers / this.bracketInfo.groups; playerNum++) {
-                this.groups[groupNum][playerNum] = {
+             //   this.groups[groupNum][playerNum] = {
+                let newPlayer = {
                     name: '',
                     wins: 0,
                     losses: 0,
                     tiebreaker: 0
                 }
+                this.$set(this.groups[groupNum], playerNum, newPlayer);
             }
         }
     }
