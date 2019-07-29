@@ -1,8 +1,8 @@
 <template>
   <div>
     <bracket-select v-if='!submitted' @updateBracket='updateInfo'></bracket-select>
-    <bracket v-if="submitted && bracket.mode != 'robin'" :numPlayers='bracket.numPlayers' :mode='bracket.mode'></bracket>
-    <round-robin v-if="bracket.mode == 'robin'" :bracketInfo='bracket'></round-robin>
+    <bracket v-if="submitted && bracket.mode != 'robin'" :numPlayers='bracket.numPlayers' :mode='bracket.mode' @returnHome='newBracket'></bracket>
+    <round-robin v-if="bracket.mode == 'robin'" :bracketInfo='bracket'  @returnHome='newBracket'></round-robin>
   </div>
 </template>
 
@@ -15,7 +15,7 @@ export default {
   data: function() {
     return {
       submitted: false,
-      bracket: {}
+      bracket: {},
     }
   },
   components: {
@@ -27,6 +27,10 @@ export default {
     updateInfo(e) {
       this.bracket = e;
       this.submitted = true;
+    },
+    newBracket(e) {
+      this.bracket = {},
+      this.submitted = false;
     }
   }
 }

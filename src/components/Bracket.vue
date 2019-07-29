@@ -1,5 +1,6 @@
 <template>
     <div class="wrapper has-text-centered">
+        <button class="button is-info" @click='returnHome'>Return Home</button>
         <br>
         <h1 class="title is-size-6" v-if="mode == 'double' && !isFinal">Upper Bracket</h1>
         <div class="container1" v-if='!isFinal'>
@@ -174,6 +175,9 @@ export default {
             else {
                 return 'is-dark';
             }
+        },
+        returnHome() {
+            this.$emit('returnHome', true);
         }
     },
     computed: {
@@ -273,6 +277,7 @@ export default {
 .container1 {
     display: flex;
     flex-direction: row;
+    justify-content: space-between;
 }
 .wrapper {
     display: flex;

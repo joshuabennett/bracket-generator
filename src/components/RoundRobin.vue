@@ -1,12 +1,17 @@
 <template>
     <div class="wrapper">
+        <button class="button is-info" @click='returnHome'>Return Home</button>
         <div class="container1">
             <div class='panel'>
                 <p class='panel-heading'>
                     Round Robin
                 </p>
                 <p class="panel-tabs">
-                    <a v-for='n in Number(bracketInfo.groups)' @click='loadGroup(n)'>Group {{n}}</a>
+                    <a v-for='n in Number(bracketInfo.groups)' 
+                        @click='loadGroup(n)'
+                        :class="{'is-active' : activeGroup == n - 1}">
+                            Group {{n}} 
+                    </a>
                 </p>
                 <div class="panel-block" v-for='n in curGroup' v-if='!submitted'>
                     <p class="control has-icons-left">
@@ -16,7 +21,7 @@
                         </span>
                     </p>
                 </div>
-                <a class="panel-block" v-for='(n, index) in curGroup' v-if='submitted' :class="{'top2' : index == 0 || index == 1}">
+                <a class="panel-block" v-for='(n, index) in curGroup' v-if='submitted' :class="{'top2' : (index < bracketInfo.cut) && n.wins > 0}">
                     <span class="panel-icon">
                         <i class="fas fa-user"></i>
                     </span>
@@ -30,18 +35,21 @@
                 <h1 class="title is-size-5 is-marginless">Matchups</h1>
                 <div class="pairing" v-for='matchup in curMatchups' v-if='submitted'> 
                     <button class="button is-info" 
-                        @click='addWin(matchup, matchup.player1, matchup.player2)'
+                        @click.once='addWin(matchup, matchup.player1, matchup.player2)'
                         :class="{'is-success': matchup.player1.name == matchup.winner}">
                         {{matchup.player1.name}}
                     </button>
                     <button class="button is-info" 
-                        @click='addWin(matchup, matchup.player2, matchup.player1)'>
+                        @click.once='addWin(matchup, matchup.player2, matchup.player1)'
+                        :class="{'is-success': matchup.player2.name == matchup.winner}">
                         {{matchup.player2.name}}
                     </button>
                 </div>
             </div>
         </div>
-        <button class="button is-info submit-button" @click='submitted = true'>Submit Players</button>
+        <button class="button is-info submit-button" @click='submitPlayers' v-if='!submitted'>Submit Players</button>
+        <button class="button is-success playoff-button" v-if='submitted'>Proceed to Playoffs</button>
+
     </div>
 </template>
 
@@ -50,11 +58,12 @@ export default {
     data: function() {
         return {
             groups: [],
+            matchups: [],
             activeGroup: 0,
             submitted: false
         }
     },
-    props: ['bracketInfo'],
+    props: ['bracketInfo', 'componentKey'],
     methods: {
         loadGroup(num) {
             this.activeGroup = num - 1;
@@ -63,6 +72,30 @@ export default {
             matchup.winner = winner.name;
             winner.wins++;
             loser.losses++;
+            this.groups.forEach( (group) => {
+                group.sort( (a, b) => {
+                    return (b.wins - a.wins)
+                });
+            });
+        },
+        submitPlayers() {
+            for (let groupNum = 0; groupNum < this.groups.length; groupNum++) {
+                this.matchups[groupNum] = [];
+                for (let i = 0; i < this.groups[groupNum].length; i++) {
+                    for (let j = i + 1; j < this.groups[groupNum].length; j++) {
+                        this.matchups[groupNum].push({
+                            player1: this.groups[groupNum][i],
+                            player2: this.groups[groupNum][j],
+                            winner: ''
+                        });
+                    }
+                }
+            }
+            this.submitted = true;
+            this.$forceUpdate();
+        },
+        returnHome() {
+            this.$emit('returnHome', true);
         }
     },
     computed: {
@@ -70,17 +103,7 @@ export default {
             return this.groups[this.activeGroup];
         },
         curMatchups() {
-            var matchups = [];
-            for (let i = 0; i < this.curGroup.length; i++) {
-                for (let j = i + 1; j < this.curGroup.length; j++) {
-                    matchups.push({
-                        player1: this.curGroup[i],
-                        player2: this.curGroup[j],
-                        winner: ''
-                    });
-                }
-            }
-        return matchups;
+            return this.matchups[this.activeGroup];
         }
     },
     created() {
