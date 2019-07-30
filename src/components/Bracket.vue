@@ -57,11 +57,11 @@
         <h1 class="title is-size-4" v-if='isFinal'>Grand Final</h1>
         <div class="container1" v-if='isFinal'>
             <div class="finalMatchup">
-                <button class="button is-info"> 
+                <button class="button is-info" @click='congratulate(finalMatchup.player1)'> 
                     <p>{{finalMatchup.player1}}</p>
                 </button>
                 <p> VS. </p>
-                <button class="button is-info"> 
+                <button class="button is-info" @click='congratulate(finalMatchup.player2)'> 
                     <p>{{finalMatchup.player2}}</p>
                 </button>
             </div>
@@ -177,6 +177,9 @@ export default {
         },
         returnHome() {
             this.$emit('returnHome', true);
+        },
+        congratulate(finalWinner) {
+            this.$emit('congrat', finalWinner);
         }
     },
     computed: {
@@ -271,11 +274,12 @@ export default {
         if (this.players.length > 0) {
             this.lockPlayers();
             let lastRound = this.bracketLayout.length - 1;
-            for (var i = 0; i < this.bracketLayout[0].length / 2; i++) {
+            for (var i = 0; i < this.bracketLayout[0].length; i++) {
                 this.bracketLayout[0][i].player1 = this.players[i*2];
                 this.bracketLayout[0][i].player2 = this.players[i*2+1];
-            }
-            for (let j = 0; j < this.bracketLayout[lastRound].length / 2; j++ ) {
+            }  
+            i=i+this.bracketLayout[0].length;
+            for (let j = 0; j < this.bracketLayout[lastRound].length; j++ ) {
                 this.bracketLayout[lastRound][j].player1 = this.players[i+j*2];
                 this.bracketLayout[lastRound][j].player2 = this.players[i+j*2+1];
             }

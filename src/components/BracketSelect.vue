@@ -46,9 +46,9 @@
                     <div class="field">
                         <div class="control">
                             <input class="input is-primary" type="text" placeholder="Primary input" v-model='bracket.groups'
-                            :class="{'is-danger' : bracket.numPlayers % bracket.groups != 0 || bracket.groups >= bracket.numPlayers}">
+                            :class="{'is-danger' : isValidGroups}">
                             <p class="help is-danger" 
-                            v-if='bracket.numPlayers % bracket.groups != 0 || bracket.groups >= bracket.numPlayers'>
+                            v-if='isValidGroups'>
                                 Please put a valid number of groups. Cannot split {{bracket.groups}} groups evenly. 
                             </p>
                         </div>
@@ -75,7 +75,7 @@
                 <div class="field-body">
                     <div class="field">
                         <div class="control">
-                            <button class="button is-primary" @click='submitBracket' :disabled='isValidPlayers || isValidCutoff || bracket.numPlayers % bracket.groups != 0 || bracket.groups >= bracket.numPlayers'>
+                            <button class="button is-primary" @click='submitBracket' :disabled='isValidPlayers || isValidCutoff || isValidGroups'>
                             Submit
                             </button>
                         </div>
@@ -109,6 +109,9 @@ export default {
         },
         isValidCutoff() {
             return this.bracket.numPlayers / this.bracket.groups <= this.bracket.cut || this.bracket.cut < 1;
+        },
+        isValidGroups() {
+            return (this.bracket.numPlayers % this.bracket.groups) != 0 || Number(this.bracket.groups) >= Number(this.bracket.numPlayers);
         }
     }
 
