@@ -35,12 +35,12 @@
                 <h1 class="title is-size-5 is-marginless">Matchups</h1>
                 <div class="pairing" v-for='matchup in curMatchups' v-if='submitted'> 
                     <button class="button is-info" 
-                        @click.once='addWin(matchup, matchup.player1, matchup.player2)'
+                        @click='addWin(matchup, matchup.player1, matchup.player2)'
                         :class="{'is-success': matchup.player1.name == matchup.winner}">
                         {{matchup.player1.name}}
                     </button>
                     <button class="button is-info" 
-                        @click.once='addWin(matchup, matchup.player2, matchup.player1)'
+                        @click='addWin(matchup, matchup.player2, matchup.player1)'
                         :class="{'is-success': matchup.player2.name == matchup.winner}">
                         {{matchup.player2.name}}
                     </button>
@@ -48,7 +48,7 @@
             </div>
         </div>
         <button class="button is-info submit-button" @click='submitPlayers' v-if='!submitted'>Submit Players</button>
-        <button class="button is-success playoff-button" v-if='submitted'>Proceed to Playoffs</button>
+        <button class="button is-success playoff-button" v-if='submitted' @click='playoffs'>Proceed to Playoffs</button>
 
     </div>
 </template>
@@ -63,7 +63,7 @@ export default {
             submitted: false
         }
     },
-    props: ['bracketInfo', 'componentKey'],
+    props: ['bracketInfo'],
     methods: {
         loadGroup(num) {
             this.activeGroup = num - 1;
@@ -77,6 +77,7 @@ export default {
                     return (b.wins - a.wins)
                 });
             });
+            console.log(matchup);
         },
         submitPlayers() {
             for (let groupNum = 0; groupNum < this.groups.length; groupNum++) {
@@ -96,6 +97,20 @@ export default {
         },
         returnHome() {
             this.$emit('returnHome', true);
+        },
+        playoffs() {
+            var playoffBracket = {
+                numPlayers: this.bracketInfo.cut * this.bracketInfo.groups,
+                players: []
+            }
+            console.log(playoffBracket.numPlayers);
+            var cutAmount = this.bracketInfo.cut;
+            this.groups.forEach( (group) => {
+                for (let i = 0; i < cutAmount; i++) {
+                    playoffBracket.players.push(group[i].name);
+                }
+            });
+            this.$emit('startPlayoff', playoffBracket);
         }
     },
     computed: {
@@ -127,7 +142,7 @@ export default {
 
 <style>
 .panel {
-    min-width: 300px;
+    min-width: 400px;
 }
 .wrapper {
     flex-direction: column;

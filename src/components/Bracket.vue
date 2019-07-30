@@ -82,14 +82,13 @@ export default {
             submitted: false
         }
     },
-    props: ['numPlayers', 'mode'],
+    props: ['numPlayers', 'mode', 'players'],
     methods: {
         lockPlayers() {
             this.submitted = true;
             var inputs = document.querySelectorAll('.input').forEach((input) => {
                 let button = document.createElement('button');
                 button.className = 'button is-primary'
-                button.innerHTML = input.getAttribute('placeholder');
                 input.parentNode.replaceChild(button, input);
             });
             console.log(this.bracketLayout);
@@ -186,7 +185,7 @@ export default {
         }
     },
     created() {
-        console.log(this.mode);
+
         var bracketDivider;
         if (this.mode == 'single') {
             bracketDivider = 4;
@@ -268,6 +267,18 @@ export default {
             this.bracketLayout = copy1;
             var copy2 = copy(this.loserBracket);
             this.loserBracket = copy2;
+        }
+        if (this.players.length > 0) {
+            this.lockPlayers();
+            let lastRound = this.bracketLayout.length - 1;
+            for (var i = 0; i < this.bracketLayout[0].length / 2; i++) {
+                this.bracketLayout[0][i].player1 = this.players[i*2];
+                this.bracketLayout[0][i].player2 = this.players[i*2+1];
+            }
+            for (let j = 0; j < this.bracketLayout[lastRound].length / 2; j++ ) {
+                this.bracketLayout[lastRound][j].player1 = this.players[i+j*2];
+                this.bracketLayout[lastRound][j].player2 = this.players[i+j*2+1];
+            }
         }
     }
 }

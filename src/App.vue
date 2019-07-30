@@ -1,8 +1,8 @@
 <template>
   <div>
     <bracket-select v-if='!submitted' @updateBracket='updateInfo'></bracket-select>
-    <bracket v-if="submitted && bracket.mode != 'robin'" :numPlayers='bracket.numPlayers' :mode='bracket.mode' @returnHome='newBracket'></bracket>
-    <round-robin v-if="bracket.mode == 'robin'" :bracketInfo='bracket'  @returnHome='newBracket'></round-robin>
+    <bracket v-if="submitted && bracket.mode != 'robin'" :numPlayers='bracket.numPlayers' :mode='bracket.mode' :players='bracket.players' @returnHome='newBracket'></bracket>
+    <round-robin v-if="bracket.mode == 'robin'" :bracketInfo='bracket'  @returnHome='newBracket' @startPlayoff='startPlayoff'></round-robin>
   </div>
 </template>
 
@@ -31,6 +31,11 @@ export default {
     newBracket(e) {
       this.bracket = {},
       this.submitted = false;
+    },
+    startPlayoff(e) {
+      this.bracket.mode = 'single';
+      this.bracket.numPlayers = e.numPlayers;
+      this.bracket.players = e.players;
     }
   }
 }

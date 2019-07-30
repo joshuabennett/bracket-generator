@@ -45,7 +45,12 @@
                 <div class="field-body">
                     <div class="field">
                         <div class="control">
-                            <input class="input is-primary" type="text" placeholder="Primary input" v-model='bracket.groups'>
+                            <input class="input is-primary" type="text" placeholder="Primary input" v-model='bracket.groups'
+                            :class="{'is-danger' : bracket.numPlayers % bracket.groups != 0 || bracket.groups >= bracket.numPlayers}">
+                            <p class="help is-danger" 
+                            v-if='bracket.numPlayers % bracket.groups != 0 || bracket.groups >= bracket.numPlayers'>
+                                Please put a valid number of groups. Cannot split {{bracket.groups}} groups evenly. 
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -57,7 +62,8 @@
                 <div class="field-body">
                     <div class="field">
                         <div class="control">
-                            <input class="input is-primary" type="text" placeholder="Primary input" v-model='bracket.cut'>
+                            <input class="input is-primary" type="text" placeholder="Primary input" v-model='bracket.cut' :class="{'is-danger' : isValidCutoff}">
+                            <p class="help is-danger" v-if='isValidCutoff'>Please put valid cutoff amount.</p>
                         </div>
                     </div>
                 </div>
@@ -69,7 +75,7 @@
                 <div class="field-body">
                     <div class="field">
                         <div class="control">
-                            <button class="button is-primary" @click='submitBracket' :disabled='isValidPlayers'>
+                            <button class="button is-primary" @click='submitBracket' :disabled='isValidPlayers || isValidCutoff || bracket.numPlayers % bracket.groups != 0 || bracket.groups >= bracket.numPlayers'>
                             Submit
                             </button>
                         </div>
@@ -100,6 +106,9 @@ export default {
     computed: {
         isValidPlayers() {
             return this.bracket.numPlayers % 4 != 0 || this.bracket.numPlayers > 16;
+        },
+        isValidCutoff() {
+            return this.bracket.numPlayers / this.bracket.groups <= this.bracket.cut || this.bracket.cut < 1;
         }
     }
 
