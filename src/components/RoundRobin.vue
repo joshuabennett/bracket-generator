@@ -1,7 +1,7 @@
 <template>
-    <div class="wrapper">
+    <div class="robin-wrapper has-text-centered">
         <button class="button is-info" @click='returnHome'>Return Home</button>
-        <div class="container1">
+        <div class="container2">
             <div class='panel'>
                 <p class='panel-heading'>
                     Round Robin
@@ -15,7 +15,7 @@
                 </p>
                 <div class="panel-block" v-for='n in curGroup' v-if='!submitted'>
                     <p class="control has-icons-left">
-                        <input class="input is-small" type="text" placeholder="Player Name" v-model='n.name'>
+                        <input class="input is-small" type="text" placeholder="Player Name" v-model='n.name' @focus='invalidPlayers = false'>
                         <span class="icon is-small is-left">
                             <i class="fas fa-user"></i>
                         </span>
@@ -47,6 +47,8 @@
                 </div>
             </div>
         </div>
+        <p class='help is-danger' v-if='invalidPlayers'>Please enter a name for each player before submitting.</p>
+        <p class="help is-danger" v-if='invalidMatchups'>One or more matchups have not been completed. Please complete before proceeding to playoff.</p>
         <button class="button is-info submit-button" @click='submitPlayers' v-if='!submitted'>Submit Players</button>
         <button class="button is-success playoff-button" v-if='submitted' @click='playoffs'>Proceed to Playoffs</button>
 
@@ -60,7 +62,9 @@ export default {
             groups: [],
             matchups: [],
             activeGroup: 0,
-            submitted: false
+            submitted: false,
+            invalidMatchups: false,
+            invalidPlayers: false
         }
     },
     props: ['bracketInfo'],
@@ -69,6 +73,14 @@ export default {
             this.activeGroup = num - 1;
         },
         addWin(matchup, winner, loser) {
+            if (matchup.winner == winner.name) {
+                return false;
+            }
+            if (matchup.winner != '') {
+                winner.losses--;
+                loser.wins--;
+            }
+            this.invalidMatchups = false;
             matchup.winner = winner.name;
             winner.wins++;
             loser.losses++;
@@ -80,10 +92,16 @@ export default {
             console.log(matchup);
         },
         submitPlayers() {
+            this.matchups = [];
             for (let groupNum = 0; groupNum < this.groups.length; groupNum++) {
-                this.matchups[groupNum] = [];
+                //this.matchups[groupNum] = [];
+                this.$set(this.matchups, groupNum, []);
                 for (let i = 0; i < this.groups[groupNum].length; i++) {
                     for (let j = i + 1; j < this.groups[groupNum].length; j++) {
+                        if (this.groups[groupNum][i].name == '' || this.groups[groupNum][j].name == '') {
+                            this.invalidPlayers = true;
+                            return false;
+                        }
                         this.matchups[groupNum].push({
                             player1: this.groups[groupNum][i],
                             player2: this.groups[groupNum][j],
@@ -93,17 +111,20 @@ export default {
                 }
             }
             this.submitted = true;
-            this.$forceUpdate();
         },
         returnHome() {
             this.$emit('returnHome', true);
         },
         playoffs() {
+            if (!this.validMatchups()) {
+                console.log('retrigger');
+                this.invalidMatchups = true;
+                return false;
+            }
             var playoffBracket = {
                 numPlayers: this.bracketInfo.cut * this.bracketInfo.groups,
                 players: []
             }
-            console.log(playoffBracket.numPlayers);
             var cutAmount = this.bracketInfo.cut;
             this.groups.forEach( (group) => {
                 for (let i = 0; i < cutAmount; i++) {
@@ -111,6 +132,17 @@ export default {
                 }
             });
             this.$emit('startPlayoff', playoffBracket);
+        },
+        validMatchups() {
+            var valid = true;
+            this.matchups.forEach( group => {
+                group.forEach( matchup => {
+                    if (!matchup.winner) {
+                        valid = false;
+                    }
+                });
+            });
+            return valid;
         }
     },
     computed: {
@@ -144,10 +176,19 @@ export default {
 .panel {
     min-width: 400px;
 }
-.wrapper {
+.robin-wrapper {
+    display: flex;
     flex-direction: column;
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    width: 850px;
+    border-radius: 10px;
+    background-color: white;
+    overflow: hidden;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 30px 18px -24px;
 }
-.container1 {
+.container2 {
     display: flex;
     flex-direction: row;
     justify-content: space-between;

@@ -1,6 +1,6 @@
 <template>
     <div class="div">
-        <div class="wrapper">
+        <div class="bracket-wrapper">
             <div class="container1 has-text-centered">
                 <button class="button is-info" @click='returnHome'>Start New Bracket</button>
                 <h2 class="title is-size-4 is-marginless">Congratulations!</h2>

@@ -1,9 +1,9 @@
 <template>
-    <div class="wrapper has-text-centered">
+    <div class="bracket-wrapper has-text-centered">
         <button class="button is-info" @click='returnHome'>Return Home</button>
         <br>
         <h1 class="title is-size-6" v-if="mode == 'double' && !isFinal">Upper Bracket</h1>
-        <div class="container1" v-if='!isFinal'>
+        <div class="container3" v-if='!isFinal'>
             <div class="bracket-column" v-for='(item, index) in bracketLayout' :class="'row'+index">
                 <div class="matchup" v-for='(n, index2) in item' v-if='n.round != 0 || submitted == true'>
                     <button class="button" 
@@ -289,12 +289,12 @@ export default {
 </script>
 
 <style>
-.container1 {
+.container3 {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
 }
-.wrapper {
+.bracket-wrapper {
     display: flex;
     flex-direction: column;
     position: absolute;
