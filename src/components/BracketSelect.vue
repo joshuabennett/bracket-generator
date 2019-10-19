@@ -153,6 +153,4 @@ html {
     position: relative;
     overflow: hidden;
 }
-img {
-}
 </style>

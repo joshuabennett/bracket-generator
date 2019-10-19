@@ -1,4 +1,5 @@
 <template>
+<div class="flex-wrapper">
     <div class="bracket-wrapper has-text-centered">
         <button class="button is-info" @click='returnHome'>Return Home</button>
         <br>
@@ -67,6 +68,7 @@
             </div>
         </div>
     </div>
+</div>
 </template>
 
 <script>
@@ -289,17 +291,24 @@ export default {
 </script>
 
 <style>
+.container1 {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
 .container3 {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
 }
+.flex-wrapper {
+    height: 100vh;
+    display: flex;
+}
 .bracket-wrapper {
+    margin: auto;
     display: flex;
     flex-direction: column;
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%,-50%);
     width: auto;
     border-radius: 10px;
     background-color: white;

@@ -1,7 +1,7 @@
 <template>
-    <div class="div">
-        <div class="bracket-wrapper">
-            <div class="container1 has-text-centered">
+    <div class="flex-wrapper flex-wrap">
+        <div class="bracket-wrapper win-wrap">
+            <div class="container4 has-text-centered">
                 <button class="button is-info" @click='returnHome'>Start New Bracket</button>
                 <h2 class="title is-size-4 is-marginless">Congratulations!</h2>
                 <h2 class="title is-size-1">{{ finalWinner }}</h2>          
@@ -36,15 +36,24 @@ export default {
 </script>
 
 <style>
-    .container1 {
+    .win-wrap {
+        position: absolute;
+            top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    }
+    .flex-wrap {
+        position: relative;
+    }
+    .container4 {
         display: flex;
         flex-direction: column;
         z-index: 9;
     }
-    .container1 h2 {
+    .container4 h2 {
         padding: 25px;
     }
     .canvas {
         z-index: 1;
+        position:absolute;
     }
 </style>
